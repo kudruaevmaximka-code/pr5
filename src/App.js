@@ -11,6 +11,7 @@ function App() {
     const [tasks, setTasks] = useState([]);
     const [title, setTitle] = useState('');
     const [deadline, setDeadline] = useState('');
+    const [filter, setFilter] = useState('all');
 
     const today = new Date().toLocaleDateString('ru-RU', {
         weekday: 'long',
@@ -18,6 +19,12 @@ function App() {
         month: 'long',
         day: 'numeric',
     });
+
+    const todayISO = new Date().toISOString().split('T')[0];
+
+    const isOverdue = (task) => {
+        return task.deadline < todayISO && task.status !== 'done';
+    };
 
     const addTask = () => {
         if (!title.trim() || !deadline) {
@@ -45,6 +52,9 @@ function App() {
         setTasks(tasks.filter((t) => t.id !== id));
     };
 
+    const visibleTasks =
+        filter === 'all' ? tasks : tasks.filter((t) => t.status === filter);
+
     return (
         <div className="app">
             <h1>Менеджер задач</h1>
@@ -65,15 +75,35 @@ function App() {
                 <button onClick={addTask}>Добавить</button>
             </div>
 
+            <div className="filter">
+                <span>Фильтр:</span>
+                <select value={filter} onChange={(e) => setFilter(e.target.value)}>
+                    <option value="all">Все</option>
+                    {STATUSES.map((s) => (
+                        <option key={s.value} value={s.value}>
+                            {s.label}
+                        </option>
+                    ))}
+                </select>
+            </div>
+
             <div className="list">
                 <h2>Задачи</h2>
-                {tasks.length === 0 ? (
+                {visibleTasks.length === 0 ? (
                     <p className="empty">Задач пока нет</p>
                 ) : (
-                    tasks.map((task) => (
-                        <div key={task.id} className="task">
+                    visibleTasks.map((task) => (
+                        <div
+                            key={task.id}
+                            className={`task ${isOverdue(task) ? 'overdue' : ''}`}
+                        >
                             <div className="task-info">
-                                <span className="task-title">{task.title}</span>
+                                <span className="task-title">
+                                    {task.title}
+                                    {isOverdue(task) && (
+                                        <span className="overdue-mark">Просрочено</span>
+                                    )}
+                                </span>
                                 <span className="task-deadline">до {task.deadline}</span>
                             </div>
                             <select
