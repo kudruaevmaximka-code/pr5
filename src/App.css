@@ -134,7 +134,7 @@ h1 {
 }
 
 .task.overdue {
-  border: 2px #c0392b;
+    border: 1px solid #e74c3c;
 }
 
 .overdue-mark {

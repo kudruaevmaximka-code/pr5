@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
 
 const STATUSES = [
@@ -8,10 +8,17 @@ const STATUSES = [
 ];
 
 function App() {
-    const [tasks, setTasks] = useState([]);
+    const [tasks, setTasks] = useState(() => {
+        const saved = localStorage.getItem('tasks');
+        return saved ? JSON.parse(saved) : [];
+    });
     const [title, setTitle] = useState('');
     const [deadline, setDeadline] = useState('');
     const [filter, setFilter] = useState('all');
+
+    useEffect(() => {
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+    }, [tasks]);
 
     const today = new Date().toLocaleDateString('ru-RU', {
         weekday: 'long',
